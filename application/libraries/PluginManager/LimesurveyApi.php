@@ -399,9 +399,18 @@ class LimesurveyApi
      */
     public function getQuestions($surveyId, $language = 'en', $conditions = array())
     {
-        $conditions['sid'] = $surveyId;
-        $conditions['language'] = $language;
-        return \Question::model()->with('subquestions')->findAllByAttributes($conditions);
+        //$conditions['sid'] = $surveyId;
+        //$conditions['questionL10ns.language'] = $language;
+        return \Question::model()
+            ->with('subquestions')
+            ->with('questionL10ns')
+            ->findAll(
+                'questionL10ns.language = :language AND t.sid = :sid',
+                [
+                    ':language' => $language,
+                    ':sid'      => $surveyId
+                ]
+            );
     }
 
     /**

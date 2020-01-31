@@ -279,7 +279,7 @@ class Survey extends LSActiveRecord
             }
             SettingGlobal::model()->deleteAll($oCriteria);
             // All Question id from this survey for ALL users
-            $aQuestionId = CHtml::listData(Question::model()->findAll(array('select'=>'qid', 'condition'=>'sid=:sid', 'params'=>array(':sid'=>$this->sid))), 'qid', 'qid');
+            $aQuestionId = CHtml::listData(Question::model()->findAll(array('select'=>'qid', 'condition'=>'t.sid=:sid', 'params'=>array(':sid'=>$this->sid))), 'qid', 'qid');
             $oCriteria = new CDbCriteria();
             $oCriteria->compare('stg_name', 'last_question_%', true, 'OR', false);
             if (Yii::app()->db->getDriverName() == 'pgsql') {

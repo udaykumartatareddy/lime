@@ -387,10 +387,13 @@ class LSActiveRecord extends CActiveRecord
     /**
      * Encrypt values before saving to the database
      */
-    public function encryptSave($runValidation=false)
+    public function encryptSave($runValidation=true)
     {
         // run validation on attribute values before encryption take place, it is impossible to validate encrypted values
         if ($runValidation){
+            // decrypt attributes before validation
+            $this->decryptEncryptAttributes('decrypt');
+            // validate attributes
             if(!$this->validate()) {
                 return false;
             }  
@@ -422,7 +425,12 @@ class LSActiveRecord extends CActiveRecord
         } else {
             $attributes = $this->encryptAttributeValues($this->attributes, true, false);
             foreach ($attributes as $key => $attribute) {
-                $this->$key = $sodium->$action($attribute);
+                // check if the attribute should be decrypted and can be decrypted (maybe plaintexts in crypted fields)
+                if ($action == 'decrypt' && strlen(base64_decode($attribute)) < 64) {
+                    // attribute is not a valid base64 encoded value and can not be decrypted
+                } else {
+                    $this->$key = $sodium->$action($attribute);
+                }
             }
         }
     }
